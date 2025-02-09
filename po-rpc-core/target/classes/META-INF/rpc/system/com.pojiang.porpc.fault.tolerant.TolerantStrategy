@@ -1,0 +1,4 @@
+failBack=com.pojiang.porpc.fault.tolerant.FailBackTolerantStrategy
+failFast=com.pojiang.porpc.fault.tolerant.FailFastTolerantStrategy
+failOver=com.pojiang.porpc.fault.tolerant.FailOverTolerantStrategy
+failSafe=com.pojiang.porpc.fault.tolerant.FailSafeTolerantStrategy

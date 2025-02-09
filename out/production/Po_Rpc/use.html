@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #70c5ce;
+        }
+
+        canvas {
+            background-color: #ffffff;
+            border: 2px solid #000;
+        }
+    </style>
+</head>
+<body>
+<canvas id="gameCanvas" width="400" height="600"></canvas>
+<script>
+    // 设置画布和上下文
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // 游戏参数
+    const gravity = 0.5;
+    const flapStrength = -10;
+    const pipeWidth = 50;
+    const pipeGap = 150;
+    let birdY = canvas.height / 2;
+    let birdVelocity = 0;
+    let birdFlap = false;
+    let score = 0;
+
+    // 小鸟对象
+    const bird = {
+        x: 50,
+        y: birdY,
+        width: 40,
+        height: 40,
+        draw: function () {
+            ctx.fillStyle = "yellow";
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+        },
+        update: function () {
+            if (birdFlap) {
+                birdVelocity = flapStrength;
+                birdFlap = false;
+            }
+            birdVelocity += gravity;
+            this.y += birdVelocity;
+
+            // 确保小鸟不会飞出画布
+            if (this.y > canvas.height - this.height) {
+                this.y = canvas.height - this.height;
+            }
+            if (this.y < 0) {
+                this.y = 0;
+            }
+        }
+    };
+
+    // 管道对象
+    const pipes = [];
+
+    function createPipe() {
+        const height = Math.floor(Math.random() * (canvas.height - pipeGap));
+        pipes.push({
+            x: canvas.width,
+            y: height,
+            width: pipeWidth,
+            height: canvas.height - height - pipeGap
+        });
+    }
+
+    function updatePipes() {
+        pipes.forEach(pipe => {
+            pipe.x -= 2;
+        });
+
+        // 删除已移出画布的管道
+        for (let i = 0; i < pipes.length; i++) {
+            if (pipes[i].x + pipes[i].width < 0) {
+                pipes.splice(i, 1);
+                score++;
+                i--;
+            }
+        }
+    }
+
+    function drawPipes() {
+        ctx.fillStyle = "green";
+        pipes.forEach(pipe => {
+            ctx.fillRect(pipe.x, 0, pipe.width, pipe.y); // 上管道
+            ctx.fillRect(pipe.x, pipe.y + pipeGap, pipe.width, pipe.height); // 下管道
+        });
+    }
+
+    function checkCollisions() {
+        for (let i = 0; i < pipes.length; i++) {
+            const pipe = pipes[i];
+            if (bird.x + bird.width > pipe.x && bird.x < pipe.x + pipe.width) {
+                if (bird.y < pipe.y || bird.y + bird.height > pipe.y + pipeGap) {
+                    return true; // 碰撞
+                }
+            }
+        }
+        return false;
+    }
+
+    function drawScore() {
+        ctx.font = "30px Arial";
+        ctx.fillStyle = "black";
+        ctx.fillText("Score: " + score, 20, 40);
+    }
+
+    function resetGame() {
+        bird.y = canvas.height / 2;
+        birdVelocity = 0;
+        pipes.length = 0;
+        score = 0;
+    }
+
+    // 游戏主循环
+    function gameLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        bird.update();
+        bird.draw();
+
+        if (Math.random() < 0.01) {
+            createPipe();
+        }
+
+        updatePipes();
+        drawPipes();
+        drawScore();
+
+        if (checkCollisions()) {
+            alert("游戏结束！你的分数是：" + score);
+            resetGame();
+        }
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    // 监听用户输入
+    window.addEventListener('keydown', function (event) {
+        if (event.key === " " || event.key === "ArrowUp") {
+            birdFlap = true;
+        }
+    });
+
+    // 开始游戏
+    gameLoop();
+</script>
+</body>
+</html>

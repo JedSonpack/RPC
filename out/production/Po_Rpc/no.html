@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #70c5ce;
+        }
+        canvas {
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+<canvas id="gameCanvas" width="400" height="600"></canvas>
+<script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const GRAVITY = 0.25;
+    const JUMP_STRENGTH = -4.5;
+    const PIPE_WIDTH = 60;
+    const PIPE_GAP = 150;
+    const PIPE_VELOCITY = 2;
+
+    let birdY = canvas.height / 2;
+    let birdVelocity = 0;
+    const birdWidth = 40;
+    const birdHeight = 40;
+    let birdJumping = false;
+
+    let pipes = [];
+    let score = 0;
+
+    // Handle user input (flapping the bird)
+    document.addEventListener("keydown", (e) => {
+        if (e.code === "Space") {
+            birdVelocity = JUMP_STRENGTH; // Bird jumps
+            birdJumping = true;
+        }
+    });
+
+    function generatePipe() {
+        const gapStart = Math.random() * (canvas.height - PIPE_GAP);
+        pipes.push({
+            x: canvas.width,
+            topY: gapStart,
+            bottomY: gapStart + PIPE_GAP,
+        });
+    }
+
+    function drawBird() {
+        birdVelocity += GRAVITY; // Apply gravity
+        birdY += birdVelocity;
+
+        // Draw the bird
+        ctx.fillStyle = "#FFD700";
+        ctx.fillRect(50, birdY, birdWidth, birdHeight);
+    }
+
+    function drawPipes() {
+        for (let i = 0; i < pipes.length; i++) {
+            const pipe = pipes[i];
+
+            // Move pipes to the left
+            pipe.x -= PIPE_VELOCITY;
+
+            // Draw the pipes
+            ctx.fillStyle = "#008000";
+            ctx.fillRect(pipe.x, 0, PIPE_WIDTH, pipe.topY); // Top pipe
+            ctx.fillRect(pipe.x, pipe.bottomY, PIPE_WIDTH, canvas.height - pipe.bottomY); // Bottom pipe
+
+            // Remove pipes that are off-screen
+            if (pipe.x + PIPE_WIDTH < 0) {
+                pipes.splice(i, 1);
+                score++;
+            }
+        }
+    }
+
+    function detectCollisions() {
+        // Check if bird hits the ground
+        if (birdY + birdHeight > canvas.height) {
+            endGame();
+        }
+
+        // Check if bird hits the top
+        if (birdY < 0) {
+            birdY = 0;
+            birdVelocity = 0;
+        }
+
+        // Check if bird hits any pipes
+        for (let i = 0; i < pipes.length; i++) {
+            const pipe = pipes[i];
+            if (
+                50 + birdWidth > pipe.x &&
+                50 < pipe.x + PIPE_WIDTH &&
+                (birdY < pipe.topY || birdY + birdHeight > pipe.bottomY)
+            ) {
+                endGame();
+            }
+        }
+    }
+
+    function updateScore() {
+        ctx.fillStyle = "#000";
+        ctx.font = "24px Arial";
+        ctx.fillText(`Score: ${score}`, 10, 30);
+    }
+
+    function endGame() {
+        // Stop the game
+        ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#FFF";
+        ctx.font = "48px Arial";
+        ctx.fillText("Game Over", 100, canvas.height / 2 - 24);
+        ctx.font = "24px Arial";
+        ctx.fillText(`Final Score: ${score}`, 140, canvas.height / 2 + 24);
+        cancelAnimationFrame(gameLoop);
+    }
+
+    function gameLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+        drawBird();
+        drawPipes();
+        detectCollisions();
+        updateScore();
+
+        if (Math.random() < 0.01) {
+            generatePipe();
+        }
+
+        requestAnimationFrame(gameLoop); // Keep the game running
+    }
+
+    // Start the game
+    gameLoop();
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="po-rpc-easy-1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/po-rpc-easy/target/po-rpc-easy-1.0-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
