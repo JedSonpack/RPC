@@ -1,0 +1,2 @@
+no=com.pojiang.porpc.fault.retry.NoRetryStrategy
+fixedInterval=com.pojiang.porpc.fault.retry.FixedIntervalRetryStrategy

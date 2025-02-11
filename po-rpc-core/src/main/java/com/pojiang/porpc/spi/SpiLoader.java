@@ -79,6 +79,9 @@ public class SpiLoader {
         Map<String, Class<?>> keyClassMap = new HashMap<>();
         for (String scanDir : SCAN_DIRS) {
             System.out.println(scanDir + loadClass.getName());
+            // scanDir:META-INF/rpc/system/
+            //loaderClass : com......serializer
+            // 其实只有一个
             List<URL> resources = ResourceUtil.getResources(scanDir + loadClass.getName()); //定位到每一个文件
             //读取每个文件
             for (URL resource : resources) {
