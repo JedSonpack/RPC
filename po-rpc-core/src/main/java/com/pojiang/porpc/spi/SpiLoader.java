@@ -1,6 +1,9 @@
 package com.pojiang.porpc.spi;
 
 import cn.hutool.core.io.resource.ResourceUtil;
+import com.pojiang.porpc.fault.retry.RetryStrategy;
+import com.pojiang.porpc.fault.tolerant.TolerantStrategy;
+import com.pojiang.porpc.loadblancer.LoadBalancer;
 import com.pojiang.porpc.registry.Registry;
 import com.pojiang.porpc.serializer.Serializer;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +65,7 @@ public class SpiLoader {
     /**
      * 动态加载的类列表
      */
-    private static final List<Class<?>> LOAD_CLASS_LIST = Arrays.asList(Serializer.class, Registry.class);
+    private static final List<Class<?>> LOAD_CLASS_LIST = Arrays.asList(RetryStrategy.class, TolerantStrategy.class, LoadBalancer.class, Serializer.class, Registry.class);
 
     /**
      * 加载单个类型

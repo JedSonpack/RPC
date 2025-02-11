@@ -58,7 +58,6 @@ public class ServiceProxy implements InvocationHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return null;
     }
 }

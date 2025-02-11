@@ -15,7 +15,6 @@ public class EasyProviderExample {
 
         // 配置初始化，初始化后，后边可以直接用
         RpcApplication.init();
-
         //先本地注册服务
         LocalRegistry.register(UserService.class.getName(),UserServiceImpl.class);
         // 创建服务器示例

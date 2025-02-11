@@ -38,6 +38,7 @@ public class ConfigUtils {
             configFileBuilder.append("-").append(environment);
         }
         configFileBuilder.append(RpcConstant.FILE_END_WITH);
+        // hutool的方法
         Props props = new Props(configFileBuilder.toString());
         return props.toBean(tClass, prefix); //转换成一个tclass类型的对象，只包含prefix开头的属性
     }
