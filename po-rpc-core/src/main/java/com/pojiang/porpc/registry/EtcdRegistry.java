@@ -38,7 +38,7 @@ public class EtcdRegistry implements Registry {
      */
     private static final Set<String> localRegisterNodeKeySet = new HashSet<>();
     /**
-     * 注册中⼼服务缓存
+     * 注册中⼼服务缓存，也是会变的，如果有服务节点下线了，也得更新，否则出现缓存和实际情况不一致
      */
     private RegistryServiceCache registryServiceCache = new
             RegistryServiceCache();
@@ -65,8 +65,10 @@ public class EtcdRegistry implements Registry {
         // 创建Lease客户端：获取一个 Lease 客户端，用于管理租约。
         Lease leaseClient = client.getLeaseClient();
         // 创建⼀个 30 秒的租约()，获取租约的唯一标识符 leaseId
-        long leaseId = leaseClient.grant(600L).get().getID();
+        long leaseId = leaseClient.grant(60L).get().getID();
         //设置要存储的键值对
+        // ETCD_ROOT_PATH + serviceName:serviceVersion/serviceHost
+        // /rpc/com.pojiang.example.common.service.UserService:1.0/localhost
         String registerKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
         //生成key和value
         ByteSequence key = ByteSequence.from(registerKey, StandardCharsets.UTF_8);
@@ -90,18 +92,18 @@ public class EtcdRegistry implements Registry {
 
     /**
      * 服务发现，根据服务名称作为前缀，从 Etcd 获取服务下的节点列表：
-     *
      * @param serviceKey 服务键名
      * @return
      */
     @Override
     public List<ServiceMetaInfo> serviceDiscovery(String serviceKey) {
-        // 找到serviceKey的服务
+        // 找到serviceKey的服务:com.pojiang.example.common.service.UserService:1.0
         // 前缀搜索，结尾⼀定要加 '/'
         List<ServiceMetaInfo> cacheServiceMetaInfo = registryServiceCache.readCache();
         if (cacheServiceMetaInfo != null) {
             return cacheServiceMetaInfo;
         }
+        // /rpc/com.pojiang.example.common.service.UserService:1.0/
         String searchPrefix = ETCD_ROOT_PATH + serviceKey + "/";
         try {
             // 前缀查询
@@ -153,7 +155,7 @@ public class EtcdRegistry implements Registry {
     @Override
     public void heartBeat() {
         //30秒检测以下，没有宕🐔的，重新注册，相当于续约
-        CronUtil.schedule("*/59 * * * * *", new Task() {
+        CronUtil.schedule("*/30 * * * * *", new Task() {
             @Override
             public void execute() {
                 // 遍历本节点所有的 key

@@ -9,7 +9,7 @@ import java.util.TreeMap;
 /**
  * 一致性哈希负载均衡
  * 实现虚拟节点
- *
+ * <p>
  * 每次调⽤负载均衡器时，都会重新构造 Hash 环，这是为了能够即时处理节点的变化。
  */
 public class ConsistentHashLoadBalancer implements LoadBalancer {
@@ -30,7 +30,12 @@ public class ConsistentHashLoadBalancer implements LoadBalancer {
             return null;
         }
 
+        if (serviceMetaInfoList.size() == 1) {
+            return serviceMetaInfoList.get(0);
+        }
+
         // 构建虚拟环,每一个都建立多个虚拟节点(100个)
+        // 遍历每一个服务，建立虚拟节点
         for (ServiceMetaInfo serviceMetaInfo : serviceMetaInfoList) {
             for (int i = 0; i < VIRTUAL_NODE_NUM; i++) {
                 int key = getHash(serviceMetaInfo.getServiceAddress() + "#" + i);
@@ -46,7 +51,6 @@ public class ConsistentHashLoadBalancer implements LoadBalancer {
             entry = virtualNodes.firstEntry();
         }
         return entry.getValue();
-
     }
 
     public int getHash(Object o) {

@@ -21,8 +21,11 @@ public class TcpServerHandler implements Handler<NetSocket> {
 
     @Override
     public void handle(NetSocket netSocket) {
+        // 有新的客户端连接到服务器时
         // 处理链接
+        // 用装饰者模式，对里面的代码（就是构造函数的一个参数）进行增强
         TcpBufferHandlerWrapper bufferHandlerWrapper = new TcpBufferHandlerWrapper(buffer -> {
+            // 已得到不存在沾包半包的数据
             ProtocolMessage<RpcRequest> protocolMessage;
             try {
                 protocolMessage = (ProtocolMessage<RpcRequest>) ProtocolMessageDecoder.decoder(buffer);

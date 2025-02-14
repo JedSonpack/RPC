@@ -29,7 +29,7 @@ public class TcpBufferHandlerWrapper implements Handler<Buffer> {
             public void handle(Buffer buffer) {
                 // 这里的buffer是TCP传输的数据
                 if (size == -1) {
-                    size = buffer.getInt(13);
+                    size = buffer.getInt(13); // 消息体的长度
                     parser.fixedSizeMode(size);
                     // 写⼊头信息到结果
                     resultBuffer.appendBuffer(buffer);
@@ -44,13 +44,11 @@ public class TcpBufferHandlerWrapper implements Handler<Buffer> {
                 }
             }
         });
-
         return parser;
     }
-
-
     @Override
     public void handle(Buffer buffer) {
+        // 用于处理传入的 Buffer 数据
         recordParser.handle(buffer);
     }
 }

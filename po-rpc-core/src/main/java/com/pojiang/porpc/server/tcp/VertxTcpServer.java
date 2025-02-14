@@ -15,6 +15,17 @@ public class VertxTcpServer implements HttpServer {
         NetServer server = vertx.createNetServer();
         // 处理请求
         // 每当有新的客户端连接到服务器时，TcpServerHandler 的 handle(NetSocket netSocket) 方法会被自动调用
+        // 三个handle的作用
+        /**
+         * // 第一段代码：设置连接处理器
+         * server.connectHandler(new TcpServerHandler()); // 当有新连接时，调用 TcpServerHandler 的 handle 方法
+         *
+         * // 第二段代码：设置缓冲区处理器
+         * netSocket.handler(bufferHandlerWrapper); // 当收到新数据时，调用 bufferHandlerWrapper 的 handle 方法
+         *
+         * // 第三段代码：解析数据流
+         * recordParser.handle(buffer); // 调用 RecordParser 的 handle 方法，逐步解析数据
+         */
         server.connectHandler(new TcpServerHandler());
 
         // 启动 TCP 服务器并监听指定端⼝

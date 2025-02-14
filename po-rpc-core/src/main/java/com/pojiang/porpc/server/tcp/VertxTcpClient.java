@@ -6,6 +6,7 @@ import com.pojiang.porpc.model.RpcRequest;
 import com.pojiang.porpc.model.RpcResponse;
 import com.pojiang.porpc.model.ServiceMetaInfo;
 import com.pojiang.porpc.protoco.*;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetClient;
@@ -16,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * TCP 请求客户端
+ * 原来是http的时候，可以直接发送，现在tcp只能自己写
  */
 public class VertxTcpClient {
 
@@ -56,15 +58,19 @@ public class VertxTcpClient {
                             }
 
                             // 接收响应
-                            socket.handler(buffer -> {
-                                try {
-                                    ProtocolMessage<RpcResponse> rpcResponseProtocolMessage =
-                                            (ProtocolMessage<RpcResponse>) ProtocolMessageDecoder.decoder(buffer);
-                                    responseFuture.complete(rpcResponseProtocolMessage.getBody()); // 标记为完成，返回结果
-                                } catch (IOException e) {
-                                    responseFuture.completeExceptionally(new RuntimeException("协议消息解码错误", e));
+                            socket.handler(new TcpBufferHandlerWrapper(new Handler<Buffer>() {
+                                @Override
+                                public void handle(Buffer buffer) {
+                                    // 拿到buffer信息怎么处理。已经处理过沾包和半包了
+                                    try {
+                                        ProtocolMessage<RpcResponse> rpcResponseProtocolMessage = (ProtocolMessage<RpcResponse>) ProtocolMessageDecoder.decoder(buffer);
+                                        responseFuture.complete(rpcResponseProtocolMessage.getBody());
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                 }
-                            });
+                            }));
+
                         } catch (Exception e) {
                             responseFuture.completeExceptionally(e); // 异常传递
                         }

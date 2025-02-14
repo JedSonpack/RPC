@@ -1,4 +1,0 @@
-jdk=com.pojiang.porpc.serializer.JdkSerializer
-json=com.pojiang.porpc.serializer.JsonSerializer
-kryo=com.pojiang.porpc.serializer.KryoSerializer
-hessian=com.pojiang.porpc.serializer.HessianSerializer

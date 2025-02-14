@@ -1,15 +1,12 @@
 package com.pojiang.porpc.serializer;
 
 
-import cn.hutool.http.body.BytesBody;
-
 import java.io.IOException;
 
 /**
  *  序列化接口
  */
 public interface Serializer {
-
 
     /**
      *  序列化

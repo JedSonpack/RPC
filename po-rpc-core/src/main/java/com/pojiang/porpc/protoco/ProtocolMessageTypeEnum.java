@@ -19,7 +19,6 @@ public enum ProtocolMessageTypeEnum {
 
     /**
      * 根据 key 获取枚举
-     *
      * @param key
      * @return
      */

@@ -1,3 +1,0 @@
-roundRobin=com.pojiang.porpc.loadblancer.RoundRobinLoadBalancer
-random=com.pojiang.porpc.loadblancer.RandomLoadBalancer
-consistentHash=com.pojiang.porpc.loadblancer.ConsistentHashLoadBalancer

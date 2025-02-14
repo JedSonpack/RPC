@@ -83,7 +83,7 @@ public class ServiceProxy implements InvocationHandler {
 
         try {
             // 建立重试机制
-            RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(RpcApplication.getRpcConfig().getRetryStrategy());
+            RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
             rpcResponse = retryStrategy.doRetry(() -> {
                 System.out.println("开始执行 RPC 请求...");
 //                int i = 1 / 0;
@@ -99,7 +99,8 @@ public class ServiceProxy implements InvocationHandler {
             hm.put("serviceMetaInfoList", serviceMetaInfoList);
             hm.put("loadBalancer", loadBalancer);
             hm.put("rpcRequest",rpcRequest);
-            TolerantStrategy tolerantStrategy = TolerantStrategyFactory.getInstance(RpcApplication.getRpcConfig().getTolerantStrategy());
+            TolerantStrategy tolerantStrategy = TolerantStrategyFactory.getInstance(rpcConfig.getTolerantStrategy());
+            // 重试是为了得到回应
             rpcResponse = tolerantStrategy.doTolerant(hm, e);
         }
 

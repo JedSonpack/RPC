@@ -8,10 +8,10 @@ import java.util.Map;
  * 降级到其他服务 容错机制
  */
 public class FailBackTolerantStrategy implements TolerantStrategy {
-
     @Override
     public RpcResponse doTolerant(Map<String, Object> context, Exception e) {
         // 降级其他服务，感觉可以自己写一个一定可以完成的服务Mock
+        // 保证用户一定能够得到结果
         Class<?> type = (Class<?>) context.get("returnType");
         RpcResponse rpcResponse = new RpcResponse();
         if (type.isPrimitive()) {
@@ -30,15 +30,11 @@ public class FailBackTolerantStrategy implements TolerantStrategy {
             } else if (type == byte.class) {
                 rpcResponse.setData(0.0);
             }
+        } else rpcResponse.setData(null);
 
-        }
-        if (rpcResponse.getData() != null) {
-            rpcResponse.setData(null);
-        }
         rpcResponse.setException(e);
         rpcResponse.setMessage("出现故障，已启动快失败方案！！！");
         rpcResponse.setDataType(type);
         return rpcResponse;
-
     }
 }
